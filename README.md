@@ -1,34 +1,26 @@
 # SatelliteGuard
 
-A computer vision system developed for the City of Vodnjan that uses satellite imagery to detect buildings and agricultural land usage.
+A computer vision system developed for the City of Vodnjan that uses satellite imagery to detect buildings, agricultural land usage, and illegal waste disposal sites.
 
 ## Overview
 
-SatelliteGuard is a fine-tuned YOLO model that analyzes satellite images to detect:
+SatelliteGuard combines multiple AI models to analyze satellite images and detect:
 
-- Buildings/structures
-- Agricultural land areas
+- Buildings/structures (YOLO)
+- Agricultural land areas (YOLO)
+- Waste disposal sites (Gemini 2.0 Flash)
 
 ## Technical Implementation
 
-- Based on YOLO (You Only Look Once) architecture
-- Uses Ultralytics YOLOv11 framework
+- Building and land detection based on YOLO (You Only Look Once) architecture
+- Uses Ultralytics YOLOv11 framework for primary object detection
+- Waste disposal detection powered by Google's Gemini 2.0 Flash model
 - Processes satellite imagery to identify and classify objects
 - Requires georeferenced images for location context
 
-## Model Versions
+## YOLO Model Versions
 
 - v5 - detects only houses
 - v7, v8 - detects houses and land
 
-## Usage
-
-```python
-from ultralytics import YOLO
-model = YOLO("models/satelliteguard-v8.pt")
-results = model("image.png", conf=0.4)
-```
-
-## Project Status
-
-This is a prototype implementation focusing on basic detection capabilities. Geographic coordinates must be provided alongside the input images.
+See `satelliteguard.ipynb` for implementation details and usage examples.
