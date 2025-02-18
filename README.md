@@ -17,6 +17,8 @@ SatelliteGuard combines multiple AI models to analyze satellite images and detec
 - Waste disposal detection powered by Google's Gemini 2.0 Flash model
 - Processes satellite imagery to identify and classify objects
 - Requires georeferenced images for location context
+  - Coordinates provided via coordinates.json in HTRS96/TM format
+  - Each image requires top-left and bottom-right corner coordinates
 
 ## YOLO Model Versions
 
