@@ -10,6 +10,14 @@ import torch
 import torchvision
 from PIL import Image
 from ultralytics import YOLO
+import sys
+from google import genai
+from google.genai import types
+from dotenv import load_dotenv
+from io import BytesIO
+
+# Load environment variables for API keys
+load_dotenv()
 
 # torch.classes.__path__ = []
 torch.classes.__path__ = [os.path.join(torch.__path__[0], torch.classes.__file__)] 
@@ -73,6 +81,13 @@ translations = {
     """,
         "house": "House",
         "land": "Land",
+        "waste_detection": "Illegal Waste Disposal Detection",
+        "detect_waste": "Detect Illegal Waste",
+        "running_waste_detection": "Running waste detection...",
+        "waste_found": "An illegal waste disposal site has been detected in this image!",
+        "waste_not_found": "No illegal waste disposal site detected in this image.",
+        "waste_samples": "Waste Disposal Sample Images",
+        "select_waste_sample": "Select a waste disposal sample image:",
     },
     "hr": {
         "title": "🛰️ SatelliteGuard",
@@ -128,8 +143,46 @@ translations = {
     """,
         "house": "Kuća",
         "land": "Zemljište",
+        "waste_detection": "Detekcija ilegalnog odlagališta otpada",
+        "detect_waste": "Detektiraj ilegalno odlagalište",
+        "running_waste_detection": "Detekcija otpada u tijeku...",
+        "waste_found": "Na ovoj slici nalazi se deponij otpada!",
+        "waste_not_found": "Na ovoj slici ne nalazi se deponij otpada.",
+        "waste_samples": "Primjeri slika odlagališta otpada",
+        "select_waste_sample": "Odaberite primjer slike odlagališta otpada:",
     }
 }
+
+# Function to detect illegal waste disposal
+def detect_dumpsite(_image):
+    try:
+        # Create a temporary file to save the image
+        temp_img_path = os.path.join("temp_waste_image.jpg")
+        _image.save(temp_img_path)
+        
+        client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+
+        PROMPT = "Does this image contain an illegal dumpsite?"
+
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            config=types.GenerateContentConfig(
+                system_instruction="Return a JSON object with the key 'result' and a boolean value true or false.",
+                temperature=0.1,
+                response_mime_type="application/json"
+            ),
+            contents=[PROMPT, _image])
+        
+        # Clean up the temporary file
+        if os.path.exists(temp_img_path):
+            os.remove(temp_img_path)
+            
+        print(response.text)
+
+        return json.loads(response.text)["result"]
+    except Exception as e:
+        st.error(f"Error detecting waste: {e}")
+        return False
 
 # Load the YOLO model
 @st.cache_resource
@@ -343,6 +396,7 @@ with st.expander(lang["sample_images"]):
 
     # Define allowed sample images
     allowed_samples = ["slika_1.png", "slika_2.png", "slika_3.png"]
+    waste_samples = ["barbariga.jpg", "vodnjan_kamenolom.jpg"]
 
     # Check if sample_images directory exists
     if os.path.exists("sample_images"):
@@ -390,6 +444,70 @@ with st.expander(lang["sample_images"]):
             st.write(lang["no_samples"])
     else:
         st.write(lang["dir_not_found"])
+
+# Add waste disposal detection section
+st.header(lang["waste_detection"])
+
+# Create a section for waste disposal sample images
+with st.expander(lang["waste_samples"]):
+    st.write(lang["select_waste_sample"])
+    
+    # Check if sample_images directory exists
+    if os.path.exists("sample_images"):
+        sample_files = os.listdir("sample_images")
+        waste_image_samples = [f for f in sample_files if f in waste_samples]
+        
+        if waste_image_samples:
+            waste_cols = st.columns(min(2, len(waste_image_samples)))
+            
+            for i, img_name in enumerate(waste_image_samples):
+                with waste_cols[i]:
+                    img_path = os.path.join("sample_images", img_name)
+                    
+                    # Create a callback function for each image
+                    def select_waste_image_callback(img_name=img_name):
+                        st.session_state.selected_waste_sample = img_name
+                    
+                    # Make image clickable
+                    if st.button(
+                        f"{lang['select']} {img_name}",
+                        key=f"waste_btn_{img_name}",
+                        on_click=select_waste_image_callback,
+                    ):
+                        pass  # The actual action happens in the callback
+                    
+                    # Display the image
+                    st.image(Image.open(img_path), caption=img_name, width=200)
+        else:
+            st.write(lang["no_samples"])
+    else:
+        st.write(lang["dir_not_found"])
+
+# Handle selected waste sample image for detection
+if "selected_waste_sample" in st.session_state and st.session_state.selected_waste_sample:
+    selected_waste_image = st.session_state.selected_waste_sample
+    st.success(f"{lang['selected_sample']} {selected_waste_image}")
+    
+    # Load the image
+    image_path = os.path.join("sample_images", selected_waste_image)
+    if os.path.exists(image_path):
+        waste_image = Image.open(image_path)
+        
+        # Display the selected image
+        st.subheader(lang["selected_image"])
+        st.image(waste_image, use_container_width=True)
+        
+        # Run waste detection when user clicks the button
+        if st.button(lang["detect_waste"], key="detect_waste_btn"):
+            with st.spinner(lang["running_waste_detection"]):
+                # Run waste detection
+                is_waste_detected = detect_dumpsite(waste_image)
+                
+                # Display the result
+                if is_waste_detected:
+                    st.error(lang['waste_found'])
+                else:
+                    st.success(lang['waste_not_found'])
 
 # Handle selected sample image
 if st.session_state.selected_sample:
@@ -558,6 +676,19 @@ if uploaded_file is not None:
                 file_name="annotated_image.png",
                 mime="image/png",
             )
+
+# Add button for waste detection on uploaded image
+if uploaded_file is not None:
+    if st.button(lang["detect_waste"], key="detect_waste_uploaded"):
+        with st.spinner(lang["running_waste_detection"]):
+            # Run waste detection on uploaded image
+            is_waste_detected = detect_dumpsite(image)
+            
+            # Display the result
+            if is_waste_detected:
+                st.error(lang['waste_found'])
+            else:
+                st.success(lang['waste_not_found'])
 
 st.sidebar.title(lang["about"])
 st.sidebar.info(lang["about_text"])
