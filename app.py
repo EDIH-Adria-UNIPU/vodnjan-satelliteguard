@@ -15,6 +15,119 @@ torch.classes.__path__ = []
 # Set page configuration
 st.set_page_config(page_title="SatelliteGuard", page_icon="🛰️", layout="wide")
 
+# Translations dictionary
+translations = {
+    "en": {
+        "title": "🛰️ SatelliteGuard",
+        "subtitle": "Upload a satellite image and enter coordinates to detect houses and land.",
+        "choose_file": "Choose an image file",
+        "confidence": "Confidence threshold",
+        "map_coords": "Map Coordinates (HTRS96/TM)",
+        "top_left_x": "Top-Left X",
+        "top_left_y": "Top-Left Y",
+        "bottom_right_x": "Bottom-Right X",
+        "bottom_right_y": "Bottom-Right Y",
+        "sample_images": "Sample Images",
+        "sample_click": "Click on a sample image to select it and automatically load its coordinates:",
+        "select": "Select",
+        "coords_available": "✅ Coordinates available",
+        "no_samples": "No allowed sample images found in the sample_images directory.",
+        "dir_not_found": "Sample images directory not found.",
+        "selected_sample": "Selected sample:",
+        "coords_loaded": "Coordinates loaded from coordinates.json",
+        "selected_image": "Selected Sample Image",
+        "run_sample": "Run Detection on Sample",
+        "run_detection": "Run Detection",
+        "running": "Running detection...",
+        "results": "Detection Results",
+        "legend": "**Legend:**\n- 🔴 House\n- 🔵 Land",
+        "detection_data": "Detection Data",
+        "table_view": "Table View",
+        "json_view": "JSON View",
+        "type": "Type",
+        "index": "Index",
+        "map_x": "Map X",
+        "map_y": "Map Y",
+        "confidence_col": "Confidence",
+        "download_json": "Download Detection Data (JSON)",
+        "download_image": "Download Annotated Image",
+        "original_image": "Original Image",
+        "about": "About",
+        "about_text": """
+    **SatelliteGuard Detection**
+    
+    This application uses a YOLO model to detect houses and land in satellite imagery.
+    
+    Upload an image, enter the geographic coordinates, and run the detection to visualize 
+    and analyze the results.
+    """,
+        "model_info": "Model Information",
+        "model_text": """
+    Model: satelliteguard-v9.pt
+    
+    This model is trained to detect:
+    - Houses
+    - Land
+    """,
+        "house": "House",
+        "land": "Land",
+    },
+    "hr": {
+        "title": "🛰️ SatelliteGuard",
+        "subtitle": "Učitajte satelitsku sliku i unesite koordinate za detekciju kuća i zemljišta.",
+        "choose_file": "Odaberite slikovnu datoteku",
+        "confidence": "Prag pouzdanosti",
+        "map_coords": "Koordinate karte (HTRS96/TM)",
+        "top_left_x": "Gornji-lijevi X",
+        "top_left_y": "Gornji-lijevi Y",
+        "bottom_right_x": "Donji-desni X",
+        "bottom_right_y": "Donji-desni Y",
+        "sample_images": "Primjeri slika",
+        "sample_click": "Kliknite na primjer slike za odabir i automatsko učitavanje koordinata:",
+        "select": "Odaberi",
+        "coords_available": "✅ Koordinate dostupne",
+        "no_samples": "Nema dopuštenih primjera slika u direktoriju sample_images.",
+        "dir_not_found": "Direktorij s primjerima slika nije pronađen.",
+        "selected_sample": "Odabrani primjer:",
+        "coords_loaded": "Koordinate učitane iz coordinates.json",
+        "selected_image": "Odabrana slika",
+        "run_sample": "Pokreni detekciju na primjeru",
+        "run_detection": "Pokreni detekciju",
+        "running": "Detekcija u tijeku...",
+        "results": "Rezultati detekcije",
+        "legend": "**Legenda:**\n- 🔴 Kuća\n- 🔵 Zemljište",
+        "detection_data": "Podaci detekcije",
+        "table_view": "Tablični prikaz",
+        "json_view": "JSON prikaz",
+        "type": "Tip",
+        "index": "Indeks",
+        "map_x": "Karta X",
+        "map_y": "Karta Y",
+        "confidence_col": "Pouzdanost",
+        "download_json": "Preuzmi podatke detekcije (JSON)",
+        "download_image": "Preuzmi označenu sliku",
+        "original_image": "Originalna slika",
+        "about": "O aplikaciji",
+        "about_text": """
+    **SatelliteGuard detekcija**
+    
+    Ova aplikacija koristi YOLO model za detekciju kuća i zemljišta na satelitskim snimkama.
+    
+    Učitajte sliku, unesite geografske koordinate i pokrenite detekciju za vizualizaciju 
+    i analizu rezultata.
+    """,
+        "model_info": "Informacije o modelu",
+        "model_text": """
+    Model: satelliteguard-v9.pt
+    
+    Ovaj model je treniran za detekciju:
+    - Kuća
+    - Zemljišta
+    """,
+        "house": "Kuća",
+        "land": "Zemljište",
+    }
+}
 
 # Load the YOLO model
 @st.cache_resource
@@ -35,8 +148,23 @@ def load_coordinates():
 
 coords_dict = load_coordinates()
 
-st.title("🛰️ SatelliteGuard")
-st.write("Upload a satellite image and enter coordinates to detect houses and land.")
+# Language selection in sidebar
+if "language" not in st.session_state:
+    st.session_state.language = "en"
+
+selected_language = st.sidebar.radio(
+    "Select language / Odaberite jezik",
+    options=["English", "Hrvatski"],
+    index=0 if st.session_state.language == "en" else 1,
+    horizontal=True
+)
+st.session_state.language = "en" if selected_language == "English" else "hr"
+
+# Get current language dictionary
+lang = translations[st.session_state.language]
+
+st.title(lang["title"])
+st.write(lang["subtitle"])
 
 # Session state to track the selected sample image
 if "selected_sample" not in st.session_state:
@@ -56,28 +184,28 @@ col1, col2 = st.columns(2)
 with col1:
     # File uploader
     uploaded_file = st.file_uploader(
-        "Choose an image file", type=["jpg", "jpeg", "png"]
+        lang["choose_file"], type=["jpg", "jpeg", "png"]
     )
 
     # Confidence threshold
     confidence = st.slider(
-        "Confidence threshold", min_value=0.1, max_value=1.0, value=0.4, step=0.05
+        lang["confidence"], min_value=0.1, max_value=1.0, value=0.4, step=0.05
     )
 
 with col2:
     # Coordinate inputs
-    st.subheader("Map Coordinates (HTRS96/TM)")
+    st.subheader(lang["map_coords"])
 
     # Create two columns for top-left coordinates
     tl_col1, tl_col2 = st.columns(2)
     with tl_col1:
         top_left_x = st.number_input(
-            "Top-Left X", value=st.session_state.top_left_x, key="input_top_left_x"
+            lang["top_left_x"], value=st.session_state.top_left_x, key="input_top_left_x"
         )
         st.session_state.top_left_x = top_left_x
     with tl_col2:
         top_left_y = st.number_input(
-            "Top-Left Y", value=st.session_state.top_left_y, key="input_top_left_y"
+            lang["top_left_y"], value=st.session_state.top_left_y, key="input_top_left_y"
         )
         st.session_state.top_left_y = top_left_y
 
@@ -85,14 +213,14 @@ with col2:
     br_col1, br_col2 = st.columns(2)
     with br_col1:
         bottom_right_x = st.number_input(
-            "Bottom-Right X",
+            lang["bottom_right_x"],
             value=st.session_state.bottom_right_x,
             key="input_bottom_right_x",
         )
         st.session_state.bottom_right_x = bottom_right_x
     with br_col2:
         bottom_right_y = st.number_input(
-            "Bottom-Right Y",
+            lang["bottom_right_y"],
             value=st.session_state.bottom_right_y,
             key="input_bottom_right_y",
         )
@@ -146,12 +274,12 @@ def run_detection(image, top_left, bottom_right, confidence_threshold):
                 color = (0, 0, 255)  # Red for houses (BGR format)
                 label = str(house_index)
                 house_index += 1
-                object_type = "House"
+                object_type = lang["house"]
             else:
                 color = (255, 0, 0)  # Blue for land (BGR format)
                 label = str(land_index)
                 land_index += 1
-                object_type = "Land"
+                object_type = lang["land"]
 
             # Draw dot
             cv2.circle(
@@ -208,10 +336,8 @@ def update_coordinates(image_name):
 
 
 # Display sample images section with clickable images
-with st.expander("Sample Images"):
-    st.write(
-        "Click on a sample image to select it and automatically load its coordinates:"
-    )
+with st.expander(lang["sample_images"]):
+    st.write(lang["sample_click"])
 
     # Define allowed sample images
     allowed_samples = ["slika_1.png", "slika_2.png", "slika_3.png"]
@@ -246,7 +372,7 @@ with st.expander("Sample Images"):
 
                     # Make image clickable with immediate coordinate update
                     if st.button(
-                        f"Select {img_name}",
+                        f"{lang['select']} {img_name}",
                         key=f"btn_{img_name}",
                         on_click=select_image_callback,
                     ):
@@ -257,17 +383,17 @@ with st.expander("Sample Images"):
 
                     # Show if coordinates are available
                     if img_name in coords_dict:
-                        st.write("✅ Coordinates available")
+                        st.write(lang["coords_available"])
         else:
-            st.write("No allowed sample images found in the sample_images directory.")
+            st.write(lang["no_samples"])
     else:
-        st.write("Sample images directory not found.")
+        st.write(lang["dir_not_found"])
 
 # Handle selected sample image
 if st.session_state.selected_sample:
 
     selected_image = st.session_state.selected_sample
-    st.success(f"Selected sample: {selected_image}")
+    st.success(f"{lang['selected_sample']} {selected_image}")
 
     # Load the image
     image_path = os.path.join("sample_images", selected_image)
@@ -276,7 +402,7 @@ if st.session_state.selected_sample:
 
         # Update coordinates if available
         if update_coordinates(selected_image):
-            st.info("Coordinates loaded from coordinates.json")
+            st.info(lang["coords_loaded"])
             # Use the updated values from session state
             top_left_x = st.session_state.top_left_x
             top_left_y = st.session_state.top_left_y
@@ -284,12 +410,12 @@ if st.session_state.selected_sample:
             bottom_right_y = st.session_state.bottom_right_y
 
         # Display the selected image
-        st.subheader("Selected Sample Image")
+        st.subheader(lang["selected_image"])
         st.image(image, use_container_width=True)
 
         # Run detection when user clicks the button
-        if st.button("Run Detection on Sample"):
-            with st.spinner("Running detection..."):
+        if st.button(lang["run_sample"]):
+            with st.spinner(lang["running"]):
                 # Run detection
                 result_image, detections = run_detection(
                     image,
@@ -299,23 +425,17 @@ if st.session_state.selected_sample:
                 )
 
                 # Display the result
-                st.subheader("Detection Results")
+                st.subheader(lang["results"])
                 st.image(result_image, use_container_width=True)
 
                 # Create a legend
-                st.markdown(
-                    """
-                **Legend:**
-                - 🔴 House
-                - 🔵 Land
-                """
-                )
+                st.markdown(lang["legend"])
 
                 # Display detection data
-                st.subheader("Detection Data")
+                st.subheader(lang["detection_data"])
 
                 # Create tabs for different views of the data
-                tab1, tab2 = st.tabs(["Table View", "JSON View"])
+                tab1, tab2 = st.tabs([lang["table_view"], lang["json_view"]])
 
                 with tab1:
                     # Prepare data for the table
@@ -323,11 +443,11 @@ if st.session_state.selected_sample:
                     for d in detections:
                         table_data.append(
                             {
-                                "Type": d["type"],
-                                "Index": d["index"],
-                                "Map X": f"{d['coordinates']['map'][0]:.2f}",
-                                "Map Y": f"{d['coordinates']['map'][1]:.2f}",
-                                "Confidence": f"{d['confidence']:.2f}",
+                                lang["type"]: d["type"],
+                                lang["index"]: d["index"],
+                                lang["map_x"]: f"{d['coordinates']['map'][0]:.2f}",
+                                lang["map_y"]: f"{d['coordinates']['map'][1]:.2f}",
+                                lang["confidence_col"]: f"{d['confidence']:.2f}",
                             }
                         )
 
@@ -341,7 +461,7 @@ if st.session_state.selected_sample:
                 # Option to download the detection data
                 json_str = json.dumps(detections, indent=2)
                 st.download_button(
-                    label="Download Detection Data (JSON)",
+                    label=lang["download_json"],
                     data=json_str,
                     file_name="detection_data.json",
                     mime="application/json",
@@ -351,7 +471,7 @@ if st.session_state.selected_sample:
                 buf = io.BytesIO()
                 Image.fromarray(result_image).save(buf, format="PNG")
                 st.download_button(
-                    label="Download Annotated Image",
+                    label=lang["download_image"],
                     data=buf.getvalue(),
                     file_name="annotated_image.png",
                     mime="image/png",
@@ -370,12 +490,12 @@ if uploaded_file is not None:
         image = image.convert("RGB")
 
     # Display original image
-    st.subheader("Original Image")
+    st.subheader(lang["original_image"])
     st.image(image, use_container_width=True)
 
     # Run detection when user clicks the button
-    if st.button("Run Detection"):
-        with st.spinner("Running detection..."):
+    if st.button(lang["run_detection"]):
+        with st.spinner(lang["running"]):
             # Run detection
             result_image, detections = run_detection(
                 image,
@@ -385,23 +505,17 @@ if uploaded_file is not None:
             )
 
             # Display the result
-            st.subheader("Detection Results")
+            st.subheader(lang["results"])
             st.image(result_image, use_container_width=True)
 
             # Create a legend
-            st.markdown(
-                """
-            **Legend:**
-            - 🔴 House
-            - 🔵 Land
-            """
-            )
+            st.markdown(lang["legend"])
 
             # Display detection data
-            st.subheader("Detection Data")
+            st.subheader(lang["detection_data"])
 
             # Create tabs for different views of the data
-            tab1, tab2 = st.tabs(["Table View", "JSON View"])
+            tab1, tab2 = st.tabs([lang["table_view"], lang["json_view"]])
 
             with tab1:
                 # Prepare data for the table
@@ -409,11 +523,11 @@ if uploaded_file is not None:
                 for d in detections:
                     table_data.append(
                         {
-                            "Type": d["type"],
-                            "Index": d["index"],
-                            "Map X": f"{d['coordinates']['map'][0]:.2f}",
-                            "Map Y": f"{d['coordinates']['map'][1]:.2f}",
-                            "Confidence": f"{d['confidence']:.2f}",
+                            lang["type"]: d["type"],
+                            lang["index"]: d["index"],
+                            lang["map_x"]: f"{d['coordinates']['map'][0]:.2f}",
+                            lang["map_y"]: f"{d['coordinates']['map'][1]:.2f}",
+                            lang["confidence_col"]: f"{d['confidence']:.2f}",
                         }
                     )
 
@@ -427,7 +541,7 @@ if uploaded_file is not None:
             # Option to download the detection data
             json_str = json.dumps(detections, indent=2)
             st.download_button(
-                label="Download Detection Data (JSON)",
+                label=lang["download_json"],
                 data=json_str,
                 file_name="detection_data.json",
                 mime="application/json",
@@ -437,31 +551,14 @@ if uploaded_file is not None:
             buf = io.BytesIO()
             Image.fromarray(result_image).save(buf, format="PNG")
             st.download_button(
-                label="Download Annotated Image",
+                label=lang["download_image"],
                 data=buf.getvalue(),
                 file_name="annotated_image.png",
                 mime="image/png",
             )
 
-st.sidebar.title("About")
-st.sidebar.info(
-    """
-    **SatelliteGuard Detection**
-    
-    This application uses a YOLO model to detect houses and land in satellite imagery.
-    
-    Upload an image, enter the geographic coordinates, and run the detection to visualize 
-    and analyze the results.
-    """
-)
+st.sidebar.title(lang["about"])
+st.sidebar.info(lang["about_text"])
 
-st.sidebar.title("Model Information")
-st.sidebar.info(
-    """
-    Model: satelliteguard-v9.pt
-    
-    This model is trained to detect:
-    - Houses (class 0)
-    - Land (class 1)
-    """
-)
+st.sidebar.title(lang["model_info"])
+st.sidebar.info(lang["model_text"])
