@@ -7,10 +7,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import streamlit as st
 import torch
+import torchvision
 from PIL import Image
 from ultralytics import YOLO
 
-torch.classes.__path__ = []
+# torch.classes.__path__ = []
+torch.classes.__path__ = [os.path.join(torch.__path__[0], torch.classes.__file__)] 
 
 # Set page configuration
 st.set_page_config(page_title="SatelliteGuard", page_icon="🛰️", layout="wide")
@@ -34,7 +36,7 @@ translations = {
         "no_samples": "No allowed sample images found in the sample_images directory.",
         "dir_not_found": "Sample images directory not found.",
         "selected_sample": "Selected sample:",
-        "coords_loaded": "Coordinates loaded from coordinates.json",
+        "coords_loaded": "Coordinates loaded",
         "selected_image": "Selected Sample Image",
         "run_sample": "Run Detection on Sample",
         "run_detection": "Run Detection",
@@ -89,7 +91,7 @@ translations = {
         "no_samples": "Nema dopuštenih primjera slika u direktoriju sample_images.",
         "dir_not_found": "Direktorij s primjerima slika nije pronađen.",
         "selected_sample": "Odabrani primjer:",
-        "coords_loaded": "Koordinate učitane iz coordinates.json",
+        "coords_loaded": "Koordinate učitane",
         "selected_image": "Odabrana slika",
         "run_sample": "Pokreni detekciju na primjeru",
         "run_detection": "Pokreni detekciju",
