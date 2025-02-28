@@ -1,0 +1,72 @@
+[
+    {
+        "broj_kat_cestice": "1703/1",
+        "x_coord": 291205.33,
+        "y_coord": 4982116.86,
+        "dokument": "940-06/20-01/70",
+        "kat_opcina": "Vodnjan"
+    },
+    {
+        "broj_kat_cestice": "6025/1",
+        "x_coord": 291941.10,
+        "y_coord": 4982854.22,
+        "dokument": "940-06/20-01/99",
+        "kat_opcina": "Vodnjan"
+    },
+    {
+        "broj_kat_cestice": "2513/2",
+        "x_coord": 289039.27,
+        "y_coord": 4987305.09,
+        "dokument": "940-06/20-01/70",
+        "kat_opcina": "Vodnjan"
+    },
+    {
+        "broj_kat_cestice": "5745/3",
+        "x_coord": 292379.65,
+        "y_coord": 4983560.34,
+        "dokument": "940-06/20-01/99",
+        "kat_opcina": "Vodnjan"
+    },
+    {
+        "broj_kat_cestice": "1431",
+        "x_coord": 289883.66,
+        "y_coord": 4983393.21,
+        "dokument": "940-06/20-01/95",
+        "kat_opcina": "Vodnjan"
+    },
+    {
+        "broj_kat_cestice": "3493/1",
+        "x_coord": 290906.16,
+        "y_coord": 4984826.25,
+        "dokument": "940-06/20-01/69",
+        "kat_opcina": "Vodnjan"
+    },
+    {
+        "broj_kat_cestice": "256/3",
+        "x_coord": 291927.25,
+        "y_coord": 4979530.11,
+        "dokument": "945-01/22-01/25",
+        "kat_opcina": "Galižana"
+    },
+    {
+        "broj_kat_cestice": "4291/4",
+        "x_coord": 291666.27,
+        "y_coord": 4984138.03,
+        "dokument": "945-01/22-01/26",
+        "kat_opcina": "Vodnjan"
+    },
+    {
+        "broj_kat_cestice": "334/22",
+        "x_coord": 291004.01,
+        "y_coord": 4980076.91,
+        "dokument": "945-01/22-01/33",
+        "kat_opcina": "Galižana"
+    },
+    {
+        "broj_kat_cestice": "256/2",
+        "x_coord": 291912.13,
+        "y_coord": 4979501.32,
+        "dokument": "945-01/22-01/32",
+        "kat_opcina": "Galižana"
+    }
+]
