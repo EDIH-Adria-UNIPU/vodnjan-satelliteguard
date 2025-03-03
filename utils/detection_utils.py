@@ -152,10 +152,10 @@ def run_detection(model, image, top_left, bottom_right, confidence_threshold, la
                     object_status = lang.get("detected", "detected")
                     
                     # Check if this agricultural area is in our database
-                    for area in agricultural_areas:
-                        if abs(center_x_map - area["x_coord"]) < 10 and abs(center_y_map - area["y_coord"]) < 10:
-                            print(f"Detected agricultural area {label} matches known area {area['broj_kat_cestice']}")
-                            detected_agr_areas.append((area["x_coord"], area["y_coord"]))
+                    for povrsina in agricultural_areas:
+                        if abs(center_x_map - povrsina["x_coord"]) < 10 and abs(center_y_map - povrsina["y_coord"]) < 10:
+                            detected_agr_areas.append(povrsina["x_coord"])
+                            detected_agr_areas.append(povrsina["y_coord"])
                             break
 
                 # Draw dot
@@ -200,11 +200,10 @@ def run_detection(model, image, top_left, bottom_right, confidence_threshold, la
             
             # Check if this agricultural area is within the image bounds
             if Tx <= x_map <= Bx and By <= y_map <= Ty:
-                # Check if this area was detected
-                if not any(x_map == coords[0] and y_map == coords[1] for coords in detected_agr_areas):
+                if x_map not in detected_agr_areas or y_map not in detected_agr_areas:
                     # Convert map coordinates to pixel coordinates
                     x_pix = ((x_map - Tx) / (Bx - Tx)) * img_width
-                    y_pix = ((y_map - Ty) / (Ty - By)) * img_height
+                    y_pix = ((Ty - y_map) / (Ty - By)) * img_height
                     
                     # Mark undetected agricultural areas with orange
                     cv2.circle(

@@ -104,8 +104,7 @@ with col2:
 
 # Display sample images section with clickable images
 with st.expander(lang["sample_images"]):
-    # Define allowed sample images
-    allowed_samples = ["slika_1.png", "slika_2.png", "slika_3.png"]
+    allowed_samples = ["slika_4.png", "slika_5.png", "slika_6.png"]
     waste_samples = ["barbariga.jpg", "vodnjan_kamenolom.jpg"]
     
     display_sample_images(allowed_samples, coords_dict, lang)
