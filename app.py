@@ -186,7 +186,7 @@ if "selected_waste_sample" in st.session_state and st.session_state.selected_was
                     st.success(lang['waste_not_found'])
 
 # Handle selected sample image
-if st.session_state.selected_sample:
+if st.session_state.selected_sample and uploaded_file is None:
     selected_image = st.session_state.selected_sample
     st.success(f"{lang['selected_sample']} {selected_image}")
 
