@@ -6,6 +6,8 @@ A computer vision system developed for the City of Vodnjan that uses satellite i
 
 ![Detection Example 2](assets/detection_2.png)
 
+![Streamlit App Interface](assets/app.png)
+
 ## Overview
 
 SatelliteGuard combines multiple AI models to analyze satellite images and detect:
@@ -24,3 +26,21 @@ SatelliteGuard combines multiple AI models to analyze satellite images and detec
   - Each image requires top-left and bottom-right corner coordinates
 
 See `satelliteguard.ipynb` for implementation details and usage examples.
+
+## Running the Streamlit App
+
+To run the interactive Streamlit application:
+
+1. Install the required dependencies using `uv`:
+
+   ```
+   uv pip install -e .
+   ```
+
+2. Start the Streamlit app:
+
+   ```
+   streamlit run app.py
+   ```
+
+3. The app will open in your default web browser, typically at http://localhost:8501
