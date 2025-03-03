@@ -73,6 +73,7 @@ translations = {
         "upload_waste_image": "Upload Your Own Image for Waste Detection",
         "choose_waste_file": "Choose an image file for waste detection",
         "uploaded_waste_image": "Uploaded Image for Waste Detection",
+        "buildings_land_detection": "Buildings & Land Detection",
     },
     "hr": {
         "title": "🛰️ SatelliteGuard",
@@ -143,5 +144,6 @@ translations = {
         "upload_waste_image": "Učitajte vlastitu sliku za detekciju otpada",
         "choose_waste_file": "Odaberite slikovnu datoteku za detekciju otpada",
         "uploaded_waste_image": "Učitana slika za detekciju otpada",
+        "buildings_land_detection": "Detekcija zgrada i zemljišta",
     }
 } 

@@ -54,162 +54,129 @@ if "bottom_right_x" not in st.session_state:
 if "bottom_right_y" not in st.session_state:
     st.session_state.bottom_right_y = 4983991.71
 
-# Create two columns for the form
-col1, col2 = st.columns(2)
+tab1, tab2 = st.tabs([lang["buildings_land_detection"], lang["waste_detection"]])
 
-with col1:
-    # File uploader
-    uploaded_file = st.file_uploader(
-        lang["choose_file"], type=["jpg", "jpeg", "png"]
-    )
+# Tab 1: Buildings and Land Detection
+with tab1:
+    st.header(lang["buildings_land_detection"])
+    
+    # Create two columns for the form
+    col1, col2 = st.columns(2)
 
-    # Confidence threshold
-    confidence = st.slider(
-        lang["confidence"], min_value=0.1, max_value=1.0, value=0.3, step=0.05
-    )
-
-with col2:
-    # Coordinate inputs
-    st.subheader(lang["map_coords"])
-
-    # Create two columns for top-left coordinates
-    tl_col1, tl_col2 = st.columns(2)
-    with tl_col1:
-        top_left_x = st.number_input(
-            lang["top_left_x"], value=st.session_state.top_left_x, key="input_top_left_x"
+    with col1:
+        # File uploader
+        uploaded_file = st.file_uploader(
+            lang["choose_file"], type=["jpg", "jpeg", "png"]
         )
-        st.session_state.top_left_x = top_left_x
-    with tl_col2:
-        top_left_y = st.number_input(
-            lang["top_left_y"], value=st.session_state.top_left_y, key="input_top_left_y"
+
+        # Confidence threshold
+        confidence = st.slider(
+            lang["confidence"], min_value=0.1, max_value=1.0, value=0.3, step=0.05
         )
-        st.session_state.top_left_y = top_left_y
 
-    # Create two columns for bottom-right coordinates
-    br_col1, br_col2 = st.columns(2)
-    with br_col1:
-        bottom_right_x = st.number_input(
-            lang["bottom_right_x"],
-            value=st.session_state.bottom_right_x,
-            key="input_bottom_right_x",
-        )
-        st.session_state.bottom_right_x = bottom_right_x
-    with br_col2:
-        bottom_right_y = st.number_input(
-            lang["bottom_right_y"],
-            value=st.session_state.bottom_right_y,
-            key="input_bottom_right_y",
-        )
-        st.session_state.bottom_right_y = bottom_right_y
+    with col2:
+        # Coordinate inputs
+        st.subheader(lang["map_coords"])
 
-# Display sample images section with clickable images
-with st.expander(lang["sample_images"]):
-    allowed_samples = ["slika_4.png", "slika_5.png", "slika_6.png"]
-    waste_samples = ["barbariga.jpg", "vodnjan_kamenolom.jpg"]
-    
-    display_sample_images(allowed_samples, coords_dict, lang)
+        # Create two columns for top-left coordinates
+        tl_col1, tl_col2 = st.columns(2)
+        with tl_col1:
+            top_left_x = st.number_input(
+                lang["top_left_x"], value=st.session_state.top_left_x, key="input_top_left_x"
+            )
+            st.session_state.top_left_x = top_left_x
+        with tl_col2:
+            top_left_y = st.number_input(
+                lang["top_left_y"], value=st.session_state.top_left_y, key="input_top_left_y"
+            )
+            st.session_state.top_left_y = top_left_y
 
-# Add waste disposal detection section
-st.header(lang["waste_detection"])
+        # Create two columns for bottom-right coordinates
+        br_col1, br_col2 = st.columns(2)
+        with br_col1:
+            bottom_right_x = st.number_input(
+                lang["bottom_right_x"],
+                value=st.session_state.bottom_right_x,
+                key="input_bottom_right_x",
+            )
+            st.session_state.bottom_right_x = bottom_right_x
+        with br_col2:
+            bottom_right_y = st.number_input(
+                lang["bottom_right_y"],
+                value=st.session_state.bottom_right_y,
+                key="input_bottom_right_y",
+            )
+            st.session_state.bottom_right_y = bottom_right_y
 
-# Create a section for waste disposal sample images
-with st.expander(lang["waste_samples"]):
-    display_waste_samples(waste_samples, lang)
+    # Display sample images section with clickable images
+    with st.expander(lang["sample_images"]):
+        allowed_samples = ["slika_4.png", "slika_5.png", "slika_6.png"]
+        display_sample_images(allowed_samples, coords_dict, lang)
 
-# Add a section for uploading custom waste detection images
-st.subheader(lang["upload_waste_image"])
-waste_uploaded_file = st.file_uploader(
-    lang["choose_waste_file"], type=["jpg", "jpeg", "png"], key="waste_file_uploader"
-)
+    # Handle selected sample image
+    if st.session_state.selected_sample and uploaded_file is None:
+        selected_image = st.session_state.selected_sample
+        st.success(f"{lang['selected_sample']} {selected_image}")
 
-# Handle uploaded waste image
-if waste_uploaded_file is not None:
-    # Clear the selected waste sample when a file is uploaded
-    if "selected_waste_sample" in st.session_state:
-        st.session_state.selected_waste_sample = None
-        
-    # Read the image
-    waste_image = Image.open(waste_uploaded_file)
-    
-    # Convert to RGB if needed
-    if waste_image.mode != "RGB":
-        waste_image = waste_image.convert("RGB")
-    
-    # Display uploaded image
-    st.subheader(lang["uploaded_waste_image"])
-    st.image(waste_image, use_container_width=True)
-    
-    # Run waste detection when user clicks the button
-    button_key = f"detect_waste_uploaded_custom_{id(waste_uploaded_file)}"
-    if st.button(lang["detect_waste"], key=button_key):
-        # Clean up any temporary files before running detection
-        cleanup_temp_files()
-        
-        with st.spinner(lang["running_waste_detection"]):
-            # Run waste detection on uploaded image
-            is_waste_detected = detect_dumpsite(waste_image)
-            
-            # Display the result
-            if is_waste_detected:
-                st.error(lang['waste_found'])
-            else:
-                st.success(lang['waste_not_found'])
+        # Load the image
+        image_path = os.path.join("sample_images", selected_image)
+        if os.path.exists(image_path):
+            image = Image.open(image_path)
 
-# Handle selected waste sample image for detection
-if "selected_waste_sample" in st.session_state and st.session_state.selected_waste_sample:
-    selected_waste_image = st.session_state.selected_waste_sample
-    st.success(f"{lang['selected_sample']} {selected_waste_image}")
-    
-    # Load the image
-    image_path = os.path.join("sample_images", selected_waste_image)
-    if os.path.exists(image_path):
-        waste_image = Image.open(image_path)
-        
-        # Display the selected image
-        st.subheader(lang["selected_image"])
-        st.image(waste_image, use_container_width=True)
-        
-        # Run waste detection when user clicks the button
-        button_key = f"detect_waste_btn_{selected_waste_image}"
-        if st.button(lang["detect_waste"], key=button_key):
-            # Clean up any temporary files before running detection
-            cleanup_temp_files()
-            
-            with st.spinner(lang["running_waste_detection"]):
-                # Run waste detection
-                is_waste_detected = detect_dumpsite(waste_image)
+            # Update coordinates if available
+            if update_coordinates(selected_image, coords_dict):
+                st.info(lang["coords_loaded"])
+                # Use the updated values from session state
+                top_left_x = st.session_state.top_left_x
+                top_left_y = st.session_state.top_left_y
+                bottom_right_x = st.session_state.bottom_right_x
+                bottom_right_y = st.session_state.bottom_right_y
+
+            # Display the selected image
+            st.subheader(lang["selected_image"])
+            st.image(image, use_container_width=True)
+
+            # Run detection when user clicks the button
+            if st.button(lang["run_sample"]):
+                # Clean up any temporary files before running detection
+                cleanup_temp_files()
                 
-                # Display the result
-                if is_waste_detected:
-                    st.error(lang['waste_found'])
-                else:
-                    st.success(lang['waste_not_found'])
+                with st.spinner(lang["running"]):
+                    # Run detection
+                    result_image, detections = run_detection(
+                        model,
+                        image,
+                        [top_left_x, top_left_y],
+                        [bottom_right_x, bottom_right_y],
+                        confidence,
+                        lang
+                    )
 
-# Handle selected sample image
-if st.session_state.selected_sample and uploaded_file is None:
-    selected_image = st.session_state.selected_sample
-    st.success(f"{lang['selected_sample']} {selected_image}")
+                    # Display the results
+                    display_detection_results(result_image, detections, lang)
 
-    # Load the image
-    image_path = os.path.join("sample_images", selected_image)
-    if os.path.exists(image_path):
-        image = Image.open(image_path)
+    # Process the uploaded image when available
+    if uploaded_file is not None:
+        # Clear the selected sample when a file is uploaded
+        st.session_state.selected_sample = None
+        
+        # Also clear any waste detection selections
+        if "selected_waste_sample" in st.session_state:
+            st.session_state.selected_waste_sample = None
 
-        # Update coordinates if available
-        if update_coordinates(selected_image, coords_dict):
-            st.info(lang["coords_loaded"])
-            # Use the updated values from session state
-            top_left_x = st.session_state.top_left_x
-            top_left_y = st.session_state.top_left_y
-            bottom_right_x = st.session_state.bottom_right_x
-            bottom_right_y = st.session_state.bottom_right_y
+        # Read the image
+        image = Image.open(uploaded_file)
 
-        # Display the selected image
-        st.subheader(lang["selected_image"])
+        # Convert to RGB if needed
+        if image.mode != "RGB":
+            image = image.convert("RGB")
+
+        # Display original image
+        st.subheader(lang["original_image"])
         st.image(image, use_container_width=True)
 
         # Run detection when user clicks the button
-        if st.button(lang["run_sample"]):
+        if st.button(lang["run_detection"]):
             # Clean up any temporary files before running detection
             cleanup_temp_files()
             
@@ -227,45 +194,85 @@ if st.session_state.selected_sample and uploaded_file is None:
                 # Display the results
                 display_detection_results(result_image, detections, lang)
 
-# Process the uploaded image when available
-if uploaded_file is not None:
-    # Clear the selected sample when a file is uploaded
-    st.session_state.selected_sample = None
+# Tab 2: Illegal Waste Detection
+with tab2:
+    st.header(lang["waste_detection"])
     
-    # Also clear any waste detection selections
-    if "selected_waste_sample" in st.session_state:
-        st.session_state.selected_waste_sample = None
+    # Create a section for waste disposal sample images
+    with st.expander(lang["waste_samples"]):
+        waste_samples = ["barbariga.jpg", "vodnjan_kamenolom.jpg"]
+        display_waste_samples(waste_samples, lang)
 
-    # Read the image
-    image = Image.open(uploaded_file)
+    # Add a section for uploading custom waste detection images
+    st.subheader(lang["upload_waste_image"])
+    waste_uploaded_file = st.file_uploader(
+        lang["choose_waste_file"], type=["jpg", "jpeg", "png"], key="waste_file_uploader"
+    )
 
-    # Convert to RGB if needed
-    if image.mode != "RGB":
-        image = image.convert("RGB")
-
-    # Display original image
-    st.subheader(lang["original_image"])
-    st.image(image, use_container_width=True)
-
-    # Run detection when user clicks the button
-    if st.button(lang["run_detection"]):
-        # Clean up any temporary files before running detection
-        cleanup_temp_files()
+    # Handle uploaded waste image
+    if waste_uploaded_file is not None:
+        # Clear the selected waste sample when a file is uploaded
+        if "selected_waste_sample" in st.session_state:
+            st.session_state.selected_waste_sample = None
+            
+        # Read the image
+        waste_image = Image.open(waste_uploaded_file)
         
-        with st.spinner(lang["running"]):
-            # Run detection
-            result_image, detections = run_detection(
-                model,
-                image,
-                [top_left_x, top_left_y],
-                [bottom_right_x, bottom_right_y],
-                confidence,
-                lang
-            )
+        # Convert to RGB if needed
+        if waste_image.mode != "RGB":
+            waste_image = waste_image.convert("RGB")
+        
+        # Display uploaded image
+        st.subheader(lang["uploaded_waste_image"])
+        st.image(waste_image, use_container_width=True)
+        
+        # Run waste detection when user clicks the button
+        button_key = f"detect_waste_uploaded_custom_{id(waste_uploaded_file)}"
+        if st.button(lang["detect_waste"], key=button_key):
+            # Clean up any temporary files before running detection
+            cleanup_temp_files()
+            
+            with st.spinner(lang["running_waste_detection"]):
+                # Run waste detection on uploaded image
+                is_waste_detected = detect_dumpsite(waste_image)
+                
+                # Display the result
+                if is_waste_detected:
+                    st.error(lang['waste_found'])
+                else:
+                    st.success(lang['waste_not_found'])
 
-            # Display the results
-            display_detection_results(result_image, detections, lang)
+    # Handle selected waste sample image for detection
+    if "selected_waste_sample" in st.session_state and st.session_state.selected_waste_sample:
+        selected_waste_image = st.session_state.selected_waste_sample
+        st.success(f"{lang['selected_sample']} {selected_waste_image}")
+        
+        # Load the image
+        image_path = os.path.join("sample_images", selected_waste_image)
+        if os.path.exists(image_path):
+            waste_image = Image.open(image_path)
+            
+            # Display the selected image
+            st.subheader(lang["selected_image"])
+            st.image(waste_image, use_container_width=True)
+            
+            # Run waste detection when user clicks the button
+            button_key = f"detect_waste_btn_{selected_waste_image}"
+            if st.button(lang["detect_waste"], key=button_key):
+                # Clean up any temporary files before running detection
+                cleanup_temp_files()
+                
+                with st.spinner(lang["running_waste_detection"]):
+                    # Run waste detection
+                    is_waste_detected = detect_dumpsite(waste_image)
+                    
+                    # Display the result
+                    if is_waste_detected:
+                        st.error(lang['waste_found'])
+                    else:
+                        st.success(lang['waste_not_found'])
 
+# Sidebar information
 st.sidebar.title(lang["about"])
 st.sidebar.info(lang["about_text"])
 
