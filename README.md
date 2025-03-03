@@ -2,6 +2,10 @@
 
 A computer vision system developed for the City of Vodnjan that uses satellite imagery to detect buildings, agricultural land usage, and illegal waste disposal sites.
 
+![Detection Example 1](assets/detection.png)
+
+![Detection Example 2](assets/detection_2.png)
+
 ## Overview
 
 SatelliteGuard combines multiple AI models to analyze satellite images and detect:
