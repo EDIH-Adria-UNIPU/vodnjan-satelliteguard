@@ -25,8 +25,8 @@ def load_coordinates():
     Returns:
         dict: Dictionary of coordinates or empty dict if file doesn't exist.
     """
-    if os.path.exists("coordinates.json"):
-        with open("coordinates.json", "r") as f:
+    if os.path.exists(os.path.join("data", "coordinates.json")):
+        with open(os.path.join("data", "coordinates.json"), "r") as f:
             return json.load(f)
     return {}
 

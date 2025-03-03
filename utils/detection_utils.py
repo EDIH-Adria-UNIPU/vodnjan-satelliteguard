@@ -69,14 +69,14 @@ def run_detection(model, image, top_left, bottom_right, confidence_threshold, la
     """
     # Load legal objects and agricultural areas data
     try:
-        with open("legalni_objekti.json", "r") as f:
+        with open(os.path.join("data", "legalni_objekti.json"), "r") as f:
             legal_objects = json.load(f)
     except Exception as e:
         print(f"Error loading legal objects: {e}")
         legal_objects = []
         
     try:
-        with open("povrsine.json", "r") as f:
+        with open(os.path.join("data", "povrsine.json"), "r") as f:
             agricultural_areas = json.load(f)
     except Exception as e:
         print(f"Error loading agricultural areas: {e}")
