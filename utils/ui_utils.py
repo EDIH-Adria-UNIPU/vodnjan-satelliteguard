@@ -166,19 +166,38 @@ def display_detection_results(result_image, detections, lang):
             # Get status with default value if not present
             status = d.get("status", "")
             
-            table_data.append(
-                {
-                    lang["type"]: d["type"],
-                    lang["index"]: d["index"],
-                    lang["map_x"]: f"{d['coordinates']['map'][0]:.2f}",
-                    lang["map_y"]: f"{d['coordinates']['map'][1]:.2f}",
-                    lang["confidence_col"]: f"{d['confidence']:.2f}",
-                    lang.get("status", "Status"): status,  # Add status column
-                }
-            )
+            # Create base data dictionary
+            data_row = {
+                lang["type"]: d["type"],
+                lang["index"]: d["index"],
+                lang["map_x"]: f"{d['coordinates']['map'][0]:.2f}",
+                lang["map_y"]: f"{d['coordinates']['map'][1]:.2f}",
+                lang["confidence_col"]: f"{d['confidence']:.2f}",
+                lang.get("status", "Status"): status,  # Add status column
+            }
+            
+            # Add document information if available
+            if "dokument" in d:
+                data_row[lang.get("document", "Document")] = d["dokument"]
+                
+            # Add cadastral municipality information if available for land areas
+            if "kat_opcina" in d:
+                data_row[lang.get("cadastral_municipality", "Cadastral Municipality")] = d["kat_opcina"]
+                
+            table_data.append(data_row)
 
-        # Display as a table
-        st.dataframe(table_data)
+        # Display as a table with custom column widths
+        document_column_name = lang.get("document", "Document")
+        column_config = {}
+        
+        # If there are documents in the data, configure the document column width
+        if any("dokument" in d for d in detections):
+            column_config[document_column_name] = st.column_config.TextColumn(
+                document_column_name,
+                width="large"  # Make the document column wider
+            )
+            
+        st.dataframe(table_data, column_config=column_config, use_container_width=True)
 
     with tab2:
         # Display as JSON

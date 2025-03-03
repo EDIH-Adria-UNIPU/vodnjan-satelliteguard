@@ -131,10 +131,12 @@ def run_detection(model, image, top_left, bottom_right, confidence_threshold, la
                     
                     # Check against legal objects
                     is_legal = False
+                    matching_obj = None
                     for obj in legal_objects:
                         if abs(center_x_map - obj["x_coord"]) < 10 and abs(center_y_map - obj["y_coord"]) < 10:
                             print(f"Detected house {label} matches legal object {obj['broj_kat_cestice']}")
                             is_legal = True
+                            matching_obj = obj
                             break
                     
                     if is_legal:
@@ -152,10 +154,12 @@ def run_detection(model, image, top_left, bottom_right, confidence_threshold, la
                     object_status = lang.get("detected", "detected")
                     
                     # Check if this agricultural area is in our database
+                    matching_area = None
                     for povrsina in agricultural_areas:
                         if abs(center_x_map - povrsina["x_coord"]) < 10 and abs(center_y_map - povrsina["y_coord"]) < 10:
                             detected_agr_areas.append(povrsina["x_coord"])
                             detected_agr_areas.append(povrsina["y_coord"])
+                            matching_area = povrsina
                             break
 
                 # Draw dot
@@ -179,19 +183,31 @@ def run_detection(model, image, top_left, bottom_right, confidence_threshold, la
                     cv2.LINE_AA,
                 )
 
+                # Create detection dictionary
+                detection_dict = {
+                    "type": object_type,
+                    "index": label,
+                    "coordinates": {
+                        "pixel": [float(center_x_pix), float(center_y_pix)],
+                        "map": [float(center_x_map), float(center_y_map)],
+                    },
+                    "confidence": float(confidence),
+                    "status": object_status
+                }
+                
+                # Add document information for legal buildings
+                if class_id == 0 and matching_obj:
+                    detection_dict["dokument"] = matching_obj["dokument"]
+                    detection_dict["broj_kat_cestice"] = matching_obj["broj_kat_cestice"]
+                
+                # Add cadastral municipality for agricultural areas
+                if class_id == 1 and matching_area:
+                    detection_dict["dokument"] = matching_area["dokument"]
+                    detection_dict["kat_opcina"] = matching_area["kat_opcina"]
+                    detection_dict["broj_kat_cestice"] = matching_area["broj_kat_cestice"]
+                
                 # Add detection to the list
-                detections.append(
-                    {
-                        "type": object_type,
-                        "index": label,
-                        "coordinates": {
-                            "pixel": [float(center_x_pix), float(center_y_pix)],
-                            "map": [float(center_x_map), float(center_y_map)],
-                        },
-                        "confidence": float(confidence),
-                        "status": object_status
-                    }
-                )
+                detections.append(detection_dict)
         
         # Check for agricultural areas that weren't detected
         for area in agricultural_areas:
@@ -203,7 +219,7 @@ def run_detection(model, image, top_left, bottom_right, confidence_threshold, la
                 if x_map not in detected_agr_areas or y_map not in detected_agr_areas:
                     # Convert map coordinates to pixel coordinates
                     x_pix = ((x_map - Tx) / (Bx - Tx)) * img_width
-                    y_pix = ((Ty - y_map) / (Ty - By)) * img_height
+                    y_pix = ((y_map - Ty) / (Ty - By)) * img_height
                     
                     # Mark undetected agricultural areas with orange
                     cv2.circle(
@@ -227,7 +243,10 @@ def run_detection(model, image, top_left, bottom_right, confidence_threshold, la
                                 "map": [float(x_map), float(y_map)],
                             },
                             "confidence": 1.0,  # Known location
-                            "status": lang.get("undetected", "undetected")
+                            "status": lang.get("undetected", "undetected"),
+                            "dokument": area["dokument"],
+                            "kat_opcina": area["kat_opcina"],
+                            "broj_kat_cestice": area["broj_kat_cestice"]
                         }
                     )
                     
