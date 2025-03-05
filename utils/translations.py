@@ -27,7 +27,7 @@ translations = {
         "run_detection": "Run Detection",
         "running": "Running detection...",
         "results": "Detection Results",
-        "legend": "**Legend:**\n- 🟢 Legal house\n- 🔴 Illegal house\n- 🔵 Detected agricultural area\n- 🟠 Undetected agricultural area",
+        "legend": "**Legend:**\n- 🟢 Object data exists\n- 🔴 Object data does not exist\n- 🔵 Detected agricultural area\n- 🟠 Undetected agricultural area",
         "detection_data": "Detection Data",
         "table_view": "Table View",
         "json_view": "JSON View",
@@ -37,8 +37,8 @@ translations = {
         "map_y": "Map Y",
         "confidence_col": "Confidence",
         "status": "Status",
-        "legal": "Legal",
-        "illegal": "Illegal",
+        "legal": "Data exists",
+        "illegal": "No data found",
         "detected": "Detected",
         "undetected": "Undetected",
         "document": "Document",
@@ -57,7 +57,7 @@ translations = {
     """,
         "model_info": "Model Information",
         "model_text": """
-    Model: satelliteguard-v9.pt
+    Model: satelliteguard-v11.pt
     
     This model is trained to detect:
     - Houses
@@ -100,7 +100,7 @@ translations = {
         "run_detection": "Pokreni detekciju",
         "running": "Detekcija u tijeku...",
         "results": "Rezultati detekcije",
-        "legend": "**Legenda:**\n- 🟢 Legalna kuća\n- 🔴 Ilegalna kuća\n- 🔵 Detektirano poljoprivredno zemljište\n- 🟠 Nedetektirano poljoprivredno zemljište",
+        "legend": "**Legenda:**\n- 🟢 Podaci za objekt postoje\n- 🔴 Podaci za objekt ne postoje\n- 🔵 Detektirano poljoprivredno zemljište\n- 🟠 Nedetektirano poljoprivredno zemljište",
         "detection_data": "Podaci detekcije",
         "table_view": "Tablični prikaz",
         "json_view": "JSON prikaz",
@@ -110,8 +110,8 @@ translations = {
         "map_y": "Karta Y",
         "confidence_col": "Pouzdanost",
         "status": "Status",
-        "legal": "Legalno",
-        "illegal": "Ilegalno",
+        "legal": "Podaci postoje",
+        "illegal": "Nema podataka",
         "detected": "Detektirano",
         "undetected": "Nedetektirano",
         "document": "Dokument",
@@ -130,7 +130,7 @@ translations = {
     """,
         "model_info": "Informacije o modelu",
         "model_text": """
-    Model: satelliteguard-v9.pt
+    Model: satelliteguard-v11.pt
     
     Ovaj model je treniran za detekciju:
     - Kuća

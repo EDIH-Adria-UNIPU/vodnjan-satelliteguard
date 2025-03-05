@@ -22,4 +22,4 @@ def load_model():
     Returns:
         YOLO: Loaded YOLO model
     """
-    return YOLO(os.path.join("models", "satelliteguard-v9.pt")) 
+    return YOLO(os.path.join("models", "satelliteguard-v11.pt")) 

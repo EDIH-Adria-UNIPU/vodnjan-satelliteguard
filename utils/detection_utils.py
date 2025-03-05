@@ -116,6 +116,12 @@ def run_detection(model, image, top_left, bottom_right, confidence_threshold, la
                 x1, y1, x2, y2, confidence, class_id = box.tolist()
                 class_id = int(class_id)
 
+                # Skip detections with low confidence
+                if class_id == 0 and confidence < 0.3:
+                    continue
+                elif class_id == 1 and confidence < 0.2:
+                    continue
+
                 # Calculate center of the bounding box
                 center_x_pix = (x1 + x2) / 2.0
                 center_y_pix = (y1 + y2) / 2.0
@@ -156,7 +162,7 @@ def run_detection(model, image, top_left, bottom_right, confidence_threshold, la
                     # Check if this agricultural area is in our database
                     matching_area = None
                     for povrsina in agricultural_areas:
-                        if abs(center_x_map - povrsina["x_coord"]) < 10 and abs(center_y_map - povrsina["y_coord"]) < 10:
+                        if abs(center_x_map - povrsina["x_coord"]) < 15 and abs(center_y_map - povrsina["y_coord"]) < 15:
                             detected_agr_areas.append(povrsina["x_coord"])
                             detected_agr_areas.append(povrsina["y_coord"])
                             matching_area = povrsina
@@ -219,7 +225,7 @@ def run_detection(model, image, top_left, bottom_right, confidence_threshold, la
                 if x_map not in detected_agr_areas or y_map not in detected_agr_areas:
                     # Convert map coordinates to pixel coordinates
                     x_pix = ((x_map - Tx) / (Bx - Tx)) * img_width
-                    y_pix = ((y_map - Ty) / (Ty - By)) * img_height
+                    y_pix = ((y_map - Ty) / (By - Ty)) * img_height
                     
                     # Mark undetected agricultural areas with orange
                     cv2.circle(
@@ -228,6 +234,18 @@ def run_detection(model, image, top_left, bottom_right, confidence_threshold, la
                         radius=5,
                         color=(0, 165, 255),  # Orange in BGR
                         thickness=-1
+                    )
+                    
+                    # Add label for undetected agricultural area
+                    cv2.putText(
+                        predicted_image_bgr,
+                        label,
+                        (int(x_pix), int(y_pix) - 10),  # slightly above the dot
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        1.0,  # font scale
+                        (0, 165, 255),  # Orange in BGR
+                        2,  # line thickness
+                        cv2.LINE_AA,
                     )
                     
                     # Add to detections list
