@@ -6,6 +6,7 @@ import streamlit as st
 from PIL import Image
 import io
 import json
+import pandas as pd
 
 
 def update_coordinates(image_name, coords_dict):
@@ -203,21 +204,55 @@ def display_detection_results(result_image, detections, lang):
         # Display as JSON
         st.json(detections)
 
-    # Option to download the detection data
+    # Create a row for download buttons
+    col1, col2, col3 = st.columns(3)
+    
+    # Option to download the detection data as JSON
     json_str = json.dumps(detections, indent=2)
-    st.download_button(
-        label=lang["download_json"],
-        data=json_str,
-        file_name="detection_data.json",
-        mime="application/json",
-    )
+    with col1:
+        st.download_button(
+            label=lang["download_json"],
+            data=json_str,
+            file_name="detection_data.json",
+            mime="application/json",
+        )
+    
+    # Option to download the detection data as Excel
+    with col2:
+        # Create a pandas DataFrame from the table data
+        df = pd.DataFrame(table_data)
+        
+        # Create a BytesIO object to store the Excel file
+        excel_buffer = io.BytesIO()
+        
+        # Write the DataFrame to the Excel file
+        with pd.ExcelWriter(excel_buffer, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, sheet_name='Detection Data')
+            
+            # Auto-adjust columns' width
+            worksheet = writer.sheets['Detection Data']
+            for i, col in enumerate(df.columns):
+                # Find the maximum length of the column
+                max_len = max(df[col].astype(str).map(len).max(), len(col)) + 2
+                # Set the column width
+                worksheet.column_dimensions[chr(65 + i)].width = max_len
+        
+        excel_data = excel_buffer.getvalue()
+        
+        st.download_button(
+            label=lang["download_excel"],
+            data=excel_data,
+            file_name="detection_data.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
 
     # Option to download the annotated image
-    buf = io.BytesIO()
-    Image.fromarray(result_image).save(buf, format="PNG")
-    st.download_button(
-        label=lang["download_image"],
-        data=buf.getvalue(),
-        file_name="annotated_image.png",
-        mime="image/png",
-    ) 
+    with col3:
+        buf = io.BytesIO()
+        Image.fromarray(result_image).save(buf, format="PNG")
+        st.download_button(
+            label=lang["download_image"],
+            data=buf.getvalue(),
+            file_name="annotated_image.png",
+            mime="image/png",
+        ) 
