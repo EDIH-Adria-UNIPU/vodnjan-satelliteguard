@@ -62,7 +62,7 @@ with tab1:
             lang["choose_file"], type=["jpg", "jpeg", "png"]
         )
         confidence = st.slider(
-            lang["confidence"], min_value=0.1, max_value=1.0, value=0.3, step=0.05
+            lang["confidence"], min_value=0.1, max_value=1.0, value=0.2, step=0.05
         )
 
     with col2:
