@@ -12,8 +12,8 @@ A computer vision system developed for the City of Vodnjan that uses satellite i
 
 SatelliteGuard combines multiple AI models to analyze satellite images and detect:
 
-- Buildings/structures (YOLOv12)
-- Agricultural land areas (YOLOv12)
+- Buildings/structures (YOLOv11)
+- Agricultural land areas (YOLOv11)
 - Waste disposal sites (Gemini 2.0 Flash)
 
 ## Technical Implementation
