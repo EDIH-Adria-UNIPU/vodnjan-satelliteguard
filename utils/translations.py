@@ -77,6 +77,7 @@ translations = {
         "choose_waste_file": "Choose an image file for waste detection",
         "uploaded_waste_image": "Uploaded Image for Waste Detection",
         "buildings_land_detection": "Buildings & Land Detection",
+        "coordinates_warning": "⚠️ You've uploaded a custom image. Please enter the correct map coordinates manually.",
     },
     "hr": {
         "title": "🛰️ SatelliteGuard",
@@ -151,5 +152,6 @@ translations = {
         "choose_waste_file": "Odaberite slikovnu datoteku za detekciju otpada",
         "uploaded_waste_image": "Učitana slika za detekciju otpada",
         "buildings_land_detection": "Detekcija zgrada i zemljišta",
-    }
-} 
+        "coordinates_warning": "⚠️ Učitali ste vlastitu sliku. Molimo unesite točne koordinate karte ručno.",
+    },
+}
