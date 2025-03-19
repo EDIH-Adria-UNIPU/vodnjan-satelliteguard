@@ -218,6 +218,22 @@ with tab1:
             st.session_state.detection_results["detections"],
             lang,
         )
+
+
+def display_waste_detection_result(lang):
+    if (
+        "waste_detection_result" in st.session_state
+        and st.session_state.waste_detection_result is not None
+    ):
+        if isinstance(st.session_state.waste_detection_result, bool):
+            if st.session_state.waste_detection_result:
+                st.error(lang["waste_found"])
+            else:
+                st.success(lang["waste_not_found"])
+        else:
+            st.error(st.session_state.waste_detection_result)
+
+
 with tab2:
     st.header(lang["waste_detection"])
 
@@ -264,6 +280,8 @@ with tab2:
                 except Exception as e:
                     st.session_state.waste_detection_result = f"Error: {str(e)}"
 
+        display_waste_detection_result(lang)
+
     # Handle selected waste sample
     elif (
         "selected_waste_sample" in st.session_state
@@ -292,17 +310,7 @@ with tab2:
                         st.session_state.waste_detection_result = f"Error: {str(e)}"
 
         # Display the detection result if it exists
-        if (
-            "waste_detection_result" in st.session_state
-            and st.session_state.waste_detection_result is not None
-        ):
-            if isinstance(st.session_state.waste_detection_result, bool):
-                if st.session_state.waste_detection_result:
-                    st.error(lang["waste_found"])
-                else:
-                    st.success(lang["waste_not_found"])
-            else:
-                st.error(st.session_state.waste_detection_result)
+        display_waste_detection_result(lang)
 
 st.sidebar.title(lang["about"])
 st.sidebar.info(lang["about_text"])
