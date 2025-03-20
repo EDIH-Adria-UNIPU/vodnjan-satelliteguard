@@ -43,7 +43,12 @@ st.session_state.language = "en" if selected_language == "English" else "hr"
 
 lang = translations[st.session_state.language]
 
-st.title(lang["title"])
+col1, col2 = st.columns([1, 15])  # Adjust the column width ratio as needed
+with col1:
+    st.image("assets/vodnjan-logo.png", width=100)
+with col2:
+    st.title(lang["title"])
+
 st.write(lang["subtitle"])
 
 if "selected_sample" not in st.session_state:

@@ -5,7 +5,7 @@ Translation strings for the SatelliteGuard application.
 # Translations dictionary
 translations = {
     "en": {
-        "title": "🛰️ SatelliteGuard",
+        "title": "SatelliteGuard",
         "subtitle": "Upload a satellite image and enter coordinates to detect houses and land.",
         "choose_file": "Choose an image file",
         "confidence": "Confidence threshold",
@@ -80,7 +80,7 @@ translations = {
         "coordinates_warning": "⚠️ You've uploaded a custom image. Please enter the correct map coordinates manually.",
     },
     "hr": {
-        "title": "🛰️ SatelliteGuard",
+        "title": "SatelliteGuard",
         "subtitle": "Učitajte satelitsku sliku i unesite koordinate za detekciju kuća i zemljišta.",
         "choose_file": "Odaberite slikovnu datoteku",
         "confidence": "Prag pouzdanosti",
